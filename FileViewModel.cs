@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -10,27 +11,9 @@ namespace PackIt
 {
     public class FileViewModel : INotifyPropertyChanged
     {
-        private string _name;
-        private string _type;
+        private FileZip[] _data;
         private string _outputPath;
-
-        public string? Name { 
-            get { return _name; } 
-            set { 
-                this._name = value!;
-                OnPropertyChanged();
-            } 
-        }
-        public string? Type
-        {
-            get { return _type; }
-            set
-            {
-                this._type = value!;
-                OnPropertyChanged();
-            }
-        }
-
+        
         public string OutputPath {
             get { return _outputPath; }
             set
@@ -40,13 +23,19 @@ namespace PackIt
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+        public FileZip[] Data {
+            get { return _data; }
+            set
+            {
+                this._data = value!;
+                OnPropertyChanged();
+            }
+        }
 
-        //private FileType _file;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public FileViewModel()
         {
-            //_file = new FileType();
         }
 
         private void OnPropertyChanged([CallerMemberName]string propertyName = "")
@@ -55,9 +44,11 @@ namespace PackIt
         }
     }
 
-    public class FileType
+    public class FileZip
     {
+        public string? Path { get; set; }
         public string? Name { get; set; }
         public string? Type { get; set; }
+        public Stream? Stream { get; set; }
     }
 }

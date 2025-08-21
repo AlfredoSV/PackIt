@@ -6,14 +6,6 @@ using System.Windows;
 
 namespace PackIt
 {
-
-    public class FileRelation
-    {
-        public Stream Stream { get; set; }
-
-        public string Name { get; set; }
-    }
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -21,7 +13,7 @@ namespace PackIt
     {
         public FileViewModel fileViewModel;
         public IProgress<int> progress;
-        
+
         public MainWindow()
         {
             InitializeComponent();
@@ -38,6 +30,7 @@ namespace PackIt
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = true;
             this.fileViewModel.OutputPath = "";
+            this.fileViewModel.Data = null;
             this.progress.Report(0);
 
             SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -49,42 +42,41 @@ namespace PackIt
                 return;
             }
 
-            FileRelation[] files = new FileRelation[openFileDialog.SafeFileNames.Length];
-
+            fileViewModel.Data = new FileZip[openFileDialog.SafeFileNames.Length];
             Stream[] streams = openFileDialog.OpenFiles();
 
-            for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < fileViewModel.Data.Length; i++)
             {
-                files[i] = new FileRelation();
-                files[i].Name = openFileDialog.SafeFileNames[i];
-                files[i].Stream = streams[i];
+                fileViewModel.Data[i] = new FileZip();
+                fileViewModel.Data[i].Name = openFileDialog.SafeFileNames[i];
+                fileViewModel.Data[i].Stream = streams[i];
+                fileViewModel.Data[i].Type = openFileDialog.SafeFileNames[i].Split(".")[openFileDialog.SafeFileNames[i].Split(".").Length - 1];
+                fileViewModel.Data[i].Path = openFileDialog.FileName.Replace(fileViewModel.Data[i].Name ?? string.Empty, "");
             }
 
             if ((bool)saveFileDialog.ShowDialog()!)
             {
-                await Task.Run(async () => {
-                    await ZipOneFile(files, saveFileDialog.FileName);
-                    this.fileViewModel.OutputPath = saveFileDialog.FileName;
-                });
+                await ZipOneFile(fileViewModel.Data, saveFileDialog.FileName);
+                this.fileViewModel.OutputPath = saveFileDialog.FileName;
             }
         }
 
-        private async Task ZipOneFile(FileRelation[] files, string pathSave)
+        private async Task ZipOneFile(FileZip[] files, string pathSave)
         {
             try
             {
                 MemoryStream memoryStream = new MemoryStream();
-                int countFile = 70/ files.Length;
+                int countFile = 70 / files.Length;
                 int report = 0;
                 using (var zip = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
                 {
                     foreach (var file in files)
                     {
-                        var entry = zip.CreateEntry(file.Name, CompressionLevel.Optimal);
+                        var entry = zip.CreateEntry(file.Name ?? string.Empty, CompressionLevel.Optimal);
                         this.progress.Report(report);
                         using (var streamEntru = entry.Open())
                         {
-                            file.Stream.Position = 0;
+                            file.Stream!.Position = 0;
                             await file.Stream.CopyToAsync(streamEntru);
                         }
                         report += countFile;
@@ -101,7 +93,7 @@ namespace PackIt
             {
                 MessageBox.Show(ex.Message);
             }
-            
+
         }
     }
 }
