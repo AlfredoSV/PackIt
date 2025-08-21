@@ -5,13 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PackIt"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="300" Width="370" ResizeMode="NoResize">
     <Window.DataContext>
         <local:FileViewModel/>
     </Window.DataContext>
-    <StackPanel HorizontalAlignment="Center">
+    <StackPanel Margin="5" HorizontalAlignment="Center" Width="300">
+        <TextBlock TextAlignment="Center" FontSize="21" FontFamily="Agency FB"  Text="Pack It"></TextBlock>
         <Button Foreground="White" Background="#6B98D1" Width="100" Margin="10" Content="Load File" x:Name="LoadFile" Click="LoadFile_Click"></Button>
-        <TextBlock Margin="10" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
-        <TextBlock Margin="10" Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+        <ProgressBar x:Name="progressUploadFile" Margin="10" Height="20"></ProgressBar>
+        <DockPanel>
+            <TextBlock Margin="5" Text="Salida: "></TextBlock>
+            <TextBlock Margin="5" Text="{Binding OutputPath, UpdateSourceTrigger=PropertyChanged}"></TextBlock>
+        </DockPanel>
     </StackPanel>
 </Window>

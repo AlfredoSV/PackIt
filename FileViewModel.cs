@@ -10,9 +10,9 @@ namespace PackIt
 {
     public class FileViewModel : INotifyPropertyChanged
     {
-
         private string _name;
         private string _type;
+        private string _outputPath;
 
         public string? Name { 
             get { return _name; } 
@@ -31,6 +31,15 @@ namespace PackIt
             }
         }
 
+        public string OutputPath {
+            get { return _outputPath; }
+            set
+            {
+                this._outputPath = value!;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         //private FileType _file;
@@ -44,7 +53,6 @@ namespace PackIt
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
     }
 
     public class FileType
